@@ -1,8 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import { HydratedDocument } from 'mongoose';
-import { IsDate, IsEmail, IsEnum, IsString } from 'class-validator';
 
 export enum Role {
   ADMIN = 'admin',
@@ -11,37 +10,26 @@ export enum Role {
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
-  @Prop()
-  @ApiProperty({ description: 'The name of the user' })
-  @IsString()
+  @Prop({ required: true })
   name: string;
 
-  @Prop()
-  @ApiProperty({ description: 'The email of the user' })
-  @IsEmail()
+  @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop()
-  @ApiProperty({ description: 'The password of the user' })
-  @IsString()
+  @Prop({ required: true , select: false })
+  @Exclude()
   password: string;
 
-  @Prop()
-  @ApiProperty({ description: 'The role of the user' })
-  @IsEnum(Role)
+  @Prop({ required: true, enum: Role, default: Role.USER })
   role: Role;
 
-  @Prop()
-  @ApiProperty({ description: 'The created at date of the user' })
-  @IsDate()
-  createdAt: Date;
+  @Prop({ type: String, select: false }) 
+  refreshToken?: string;
 
-  @Prop()
-  @ApiProperty({ description: 'The updated at date of the user' })
-  @IsDate()
-  updatedAt: Date;
+  @Prop({ type: Date })
+  refreshTokenExpires?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
