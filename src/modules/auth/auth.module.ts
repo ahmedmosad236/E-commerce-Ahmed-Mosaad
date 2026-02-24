@@ -53,6 +53,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from '../users/users.module';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
@@ -64,13 +65,11 @@ import accessTokenConfig from 'src/config/access-token.config';
     UsersModule,
     PassportModule,
 
-    // ممكن تحتفظ بيهم هنا لو عايز تستخدم الـ config في providers تانية في AuthModule
     ConfigModule.forFeature(accessTokenConfig),
     ConfigModule.forFeature(refreshTokenConfig),
 
-    // Access Token JwtModule
     JwtModule.registerAsync({
-      imports: [ConfigModule.forFeature(accessTokenConfig)], // ← الحل الرئيسي هنا
+      imports: [ConfigModule.forFeature(accessTokenConfig)],
       inject: [accessTokenConfig.KEY],
       useFactory: (config) => ({
         secret: config.secret,
@@ -78,9 +77,8 @@ import accessTokenConfig from 'src/config/access-token.config';
       }),
     }),
 
-    // Refresh Token JwtModule
     JwtModule.registerAsync({
-      imports: [ConfigModule.forFeature(refreshTokenConfig)], // ← نفس الشيء هنا
+      imports: [ConfigModule.forFeature(refreshTokenConfig)], 
       inject: [refreshTokenConfig.KEY],
       useFactory: (config) => ({
         secret: config.secret,
@@ -91,6 +89,7 @@ import accessTokenConfig from 'src/config/access-token.config';
   providers: [
     AuthService,
     LocalStrategy,
+    JwtStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
   ],

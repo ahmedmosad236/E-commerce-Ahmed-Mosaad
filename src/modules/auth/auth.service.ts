@@ -29,7 +29,13 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id }; 
+    // Ensure we have the user ID - could be _id (MongoDB) or id
+    const userId = user._id?.toString() || user.id;
+    const payload = { 
+      email: user.email, 
+      sub: userId,
+      role: user.role,
+    }; 
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload);
     return {
